@@ -74,3 +74,8 @@ bool Sphere::intersects(Ray &r, Intersection* i) {
 void Sphere::setBBox() {
 	bbox = BBox(center-Vector3f(radius, radius, radius), center+Vector3f(radius, radius, radius));
 }
+
+/* to do */
+Vector3f Sphere::sample() const {
+	return Vector3f(0.0, 0.0, 0.0);
+}

@@ -6,12 +6,12 @@
 /* A ray */
 struct Ray
 {
-	Vector3f origin;
+	Point origin;
 	Vector3f direction;
 	float t_min, t_max;
 	Ray()
 	{
-		origin = Vector3f(0,0,0);
+		origin = Point(0,0,0);
 		direction = Vector3f(0,0,0);
 		t_min = 0;
 		t_max = INFINITY;

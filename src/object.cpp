@@ -11,6 +11,11 @@ Material* Object::getMaterial() {
 	return &material;
 }
 
+/* to do */
+const Material* Object::getMaterial() const{
+	return &material;
+}
+
 bool Object::isLight() const {
 	/* If the object has emmitive coefficient in any direction, it is a light */
 	Color ke = getMaterial()->ke;

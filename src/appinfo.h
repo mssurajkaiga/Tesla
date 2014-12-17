@@ -12,16 +12,16 @@
  
 #define APPLICATION_NAME               "Tesla"
 #define APPLICATION_CODENAME           "tesla"
-#define APPLICATION_COPYRIGHT_YEARS    "2014"
+#define APPLICATION_COPYRIGHT_YEARS    "2015"
 #define APPLICATION_VERSION_MAJOR      1
 /* #undef APPLICATION_VERSION_MINOR */
 /* #undef APPLICATION_VERSION_PATCH */
 #define APPLICATION_VERSION_TYPE       "SNAPSHOT"
 #define APPLICATION_VERSION_STRING     "1.0.0-SNAPSHOT"
-#define APPLICATION_VENDOR_ID          "com.mssuraj"
-#define APPLICATION_VENDOR_NAME        "M S Suraj"
+#define APPLICATION_VENDOR_ID          "github.com/mssurajkaiga/tesla"
+#define APPLICATION_VENDOR_NAME        "Your Company"
 #define APPLICATION_VENDOR_URL         "mssuraj.in"
-#define APPLICATION_ID                 "com.mssuraj"
+#define APPLICATION_ID                 "github.com/mssurajkaiga/tesla"
 
 #ifndef APPLICATION_NAME
 #   error "Please specify the application name in the top-level CMakeLists.txt file."

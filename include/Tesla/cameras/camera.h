@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include <Tesla/core/ray.h>
+#include <Tesla/core/sample.h>
 
 class Camera
 {
