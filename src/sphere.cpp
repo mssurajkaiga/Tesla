@@ -72,7 +72,7 @@ bool Sphere::intersects(Ray &r, Intersection* i) {
 }
 
 void Sphere::setBBox() {
-	bbox = BBox(center-Vector3f(radius, radius, radius), center+Vector3f(radius, radius, radius));
+	this->bbox = BBox(center-Vector3f(radius, radius, radius), center+Vector3f(radius, radius, radius));
 }
 
 /* to do */
