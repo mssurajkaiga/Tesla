@@ -1,5 +1,4 @@
-#include <Tesla/objects/objects.h>
-#include <Tesla/core/ray.h>
+#include <Tesla/renderers/pathtracer.h>
 
 #include "app.h"
 

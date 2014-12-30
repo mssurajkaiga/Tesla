@@ -7,7 +7,9 @@
 class Aggregrate
 {
 public:
-	// to be implemented for acceleration purposes
+	virtual bool intersects(const Ray &ray, Intersection* inter) const = 0;
+	virtual BBox* getBBox() = 0;
+	virtual void setBBox() = 0;
 };
 
 #endif

@@ -7,6 +7,7 @@
 class Sampler
 {
 public:
+	int xmin, xmax, ymin, ymax, spp; // x,y pixel limits and samples-per-pixel
 	virtual Sample getSample() = 0;
 };
 

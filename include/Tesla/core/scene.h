@@ -11,6 +11,9 @@ class Scene
 public:
 	Aggregrate* objects;
 	std::vector<Light*> lights;
+
+	Scene(std::vector<Object*> objects, std::vector<Light*> lights);
+	void buildKdtree(std::vector<Object*> objects);
 };
 
 #endif
