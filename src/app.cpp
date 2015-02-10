@@ -28,15 +28,13 @@ namespace
     }
 }
 
-inline std::ostream& operator<<(std::ostream& out, const QString& str)
-{
+inline std::ostream& operator<<(std::ostream& out, const QString& str) {
     QByteArray a = str.toUtf8();
     out << a.constData();
     return out;
 }
 
-App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0]), _gui(false), _interactive(false)
-{
+App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0]), _gui(false), _interactive(false) {
     // Enforce singleton property
     if ( _instance ){
         throw std::runtime_error("Only one instance of App allowed.");
@@ -195,22 +193,23 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
     }
 }
 
-App::~App()
-{
+App::~App() {
 }
 
-App*
-App::INSTANCE()
-{
+App* App::INSTANCE() {
     return _instance;
 }
 
-void 
-App::initGUI()
-{
+void App::initGUI() {
     // Construct the main window
     _mainwindow.reset(new QMainWindow);
     _mainwindow->setCentralWidget(new QWidget);
+
+    // Setup the image display
+    myImage.load("/home/mssuraj/Pictures/test.jpg"); // load sample image for gui display testing
+    render =  new QLabel("Press render");
+    //render->setPixmap(QPixmap::fromImage(myImage));
+    renderbtn = new QPushButton("Render");
     
     // Setup the central widget
     QWidget* centralwidget = _mainwindow->centralWidget();
@@ -221,14 +220,14 @@ App::initGUI()
     int topmargin  = (desktopwidget->height()-preferredheight)/2;
     centralwidget->setWindowTitle(getProjectName());
     centralwidget->setFixedSize(preferredwidth,preferredheight);
-    std::auto_ptr<QLabel> label(new QLabel("Hello world!"));
+    //std::auto_ptr<QLabel> label(render);
     std::auto_ptr<QGridLayout> layout(new QGridLayout);
-    layout->addWidget(label.release(),0,0,Qt::AlignCenter);
+    //std::auto_ptr<QPushButton> button(renderbtn);
+    layout->addWidget(render,0,0,Qt::AlignCenter);
+    layout->addWidget(renderbtn,0,0,Qt::AlignCenter);
     centralwidget->setLayout(layout.release());
     
-    // Setup the toolbars
-    // ...
-    
+    connect(renderbtn, SIGNAL(clicked()), this, SLOT(display()));
     
     // Setup the icons
     // ...
@@ -238,21 +237,20 @@ App::initGUI()
     _mainwindow->move(leftmargin,topmargin);
 }
 
-void 
-App::interactiveMain()
-{
+void App::interactiveMain() {
     std::cout << "Hello world!" << std::endl;
 }
 
-void 
-App::consoleMain()
-{
+void App::consoleMain() {
     std::cout << "Hello world!" << std::endl;
 }
 
-void 
-App::printHelpMessage()
-{
+void App::display() {
+    render->setPixmap(QPixmap::fromImage(myImage));
+    renderbtn->hide();
+}
+
+void App::printHelpMessage() {
     std::cout << "Usage: " << getProjectInvocation() << " [options]" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "    --help                       Displays this help message." << std::endl;
@@ -278,22 +276,16 @@ App::printHelpMessage()
     std::cout << "    off" << std::endl;
 }
 
-void 
-App::printVersionMessage()
-{
+void App::printVersionMessage() {
     std::cout << getProjectName() << " v" << getProjectVersion() << std::endl;
     std::cout << getProjectVendorName() << "; Copyright (C) " << getProjectCopyrightYears();
 }
 
-void 
-App::printVersionTripletMessage()
-{
+void App::printVersionTripletMessage() {
     std::cout << getProjectVersion() << std::endl;
 }
 
-void 
-App::printApplicationIdentifier()
-{
+void App::printApplicationIdentifier() {
     std::cout << getProjectID() << std::endl;
 }
 
@@ -322,9 +314,7 @@ App::getProjectVendorName()
     return APPLICATION_VENDOR_NAME;
 }
 
-QString 
-App::getProjectID()
-{
+QString App::getProjectID() {
     return APPLICATION_ID;
 }
 

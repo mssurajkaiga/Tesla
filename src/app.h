@@ -27,6 +27,9 @@ class App : public QApplication
         QString getProjectVersion();
         QString getProjectCopyrightYears();
         QString getProjectInvocation();
+        
+    public slots:
+        void display();
 
     private:
         void initGUI();
@@ -54,6 +57,10 @@ class App : public QApplication
         bool _gui;
         bool _interactive;
         boost::shared_ptr<QMainWindow> _mainwindow;
+        
+        QImage myImage;
+        QLabel* render;
+        QPushButton *renderbtn;
 };
 
 #endif
