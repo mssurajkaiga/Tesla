@@ -1,31 +1,30 @@
 #include <Tesla/objects/object.h>
+#include <Tesla/materials/mattematerial.h>
 
-Object::Object() {
-	/*
-	material = NULL;
-	bbox = NULL;
-	*/
-}
-
-Material* Object::getMaterial() {
-	return &material;
+void Object::setMaterial(Material *mat) {
+	material = mat;
 }
 
 /* to do */
-const Material* Object::getMaterial() const{
-	return &material;
+Material* Object::getMaterial(Intersection* inter) const{
+	return material;
+}
+
+Material* Object::getMaterial() {
+	return material;
 }
 
 bool Object::isLight() const {
-	/* If the object has emmitive coefficient in any direction, it is a light */
-	Color ke = getMaterial()->ke;
-	if (ke[0] > 0.0 || ke[1] > 0.0 || ke[2] > 0.0) {
-		return true;
-	}
-
-	return false;
+	return islight;
 }
 
 BBox* Object::getBBox() {
 	return &bbox;
+}
+
+std::ostream& operator<<(std::ostream &os, Object &o) {
+	if (o.getMaterial())
+		return os << "Object(" << *(o.material) << ", " << o.bbox << "," << o.islight << ")";
+	else 
+		return os << "Object(No Material, " << o.bbox << ")";
 }

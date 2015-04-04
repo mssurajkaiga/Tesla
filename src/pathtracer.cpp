@@ -1,75 +1,40 @@
 #include <Tesla/renderers/pathtracer.h>
-#include <Tesla/core/uniformsampler.h>
-#include <Tesla/core/spectrum.h>
+#include <Tesla/samplers/uniformimagesampler.h>
+#include <Tesla/integrators/ptintegrator.h>
+#include <iostream>
 
-PathTracer::PathTracer() {
-	this->sampler = new UniformSampler;
-	depth = 5;
+PathTracer::PathTracer(ImageSampler *sampler, Integrator *i, Film* f) : Renderer(f), imagesampler(sampler), integrator(i) {
+	if (!integrator) {
+		integrator = new PTIntegrator(MAX_DEPTH, 2);
+	}
+	if (!sampler) {
+		sampler = new UniformImageSampler;
+	}
 }
 
-PathTracer::PathTracer(Sampler *sampler, int depth) {
-	this->sampler = sampler;
-	this->depth = depth;
-}
+void PathTracer::render(Scene *scene, Camera *camera) {
+	/* add preprocess calls like building acceleration structures, setting timer, etc here and then render */
 
-void PathTracer::render(Scene *scene) {
-	return;
-}
-
-/*
-Color PathTracer::trace(Scene *scene, Ray r, int depth) {
-	if (depth==this->depth) {
-		return Color(0.0, 0.0, 0.0);
+	/* render and store in film */
+	std::vector<Spectrum> values;
+	Spectrum radiance(0., 0., 0.);
+	Intersection i;
+	Ray r;
+	ImageSample* is;
+	int spp = imagesampler->spp, count = 0;
+	while (is = imagesampler->getSample()) {
+		r = camera->generateRay(imagesampler, is);
+		radiance += integrator->getRadiance(&r, &i, scene, this, is);
+		if (++count == spp) {
+			count = 0;
+			values.push_back(radiance/spp);
+			radiance = Spectrum(0., 0., 0.);
+		}
 	}
 
-	Intersection intersection;
-	if (!getIntersection(scene, r, &intersection)) {
-		return Color(0.0, 0.0, 0.0);
-	}
-
-	Ray shadowray, secondaryray;
-
-	secondaryray.origin = Point(intersection.point + MIN_VAL * intersection.normal); // displacement to prevent self-intersection with object
-	secondaryray.direction = cosineWeightedHemisphereDirection(intersection.normal); // cosine-weighted hemisphere sampling
-
-	float costheta = secondaryray.direction.dot(intersection.normal);
-	intersection.object->getMaterial();
-
-    return Color(0., 0., 0.);
+	film->store(values);
 }
-*/
 
-bool getIntersection(Scene *scene, Ray r, Intersection* intersection) {
+bool PathTracer::getIntersection(Scene *scene, Ray r, Intersection* intersection) {
 	return false;
 }
-
-/*
-Vector3f cosineWeightedHemisphereDirection(Vector3f normal) {
-    float Xi1 = (float)rand()/(float)RAND_MAX;
-    float Xi2 = (float)rand()/(float)RAND_MAX;
-
-    float  theta = acos(sqrt(1.0-Xi1));
-    float  phi = 2.0 * pi * Xi2;
-
-    float xs = sinf(theta) * cosf(phi);
-    float ys = cosf(theta);
-    float zs = sinf(theta) * sinf(phi);
-
-    Vector3f y(normal(0), normal(1), normal(2));
-    Vector3f h = y;
-    if (fabs(h(0))<=fabs(h(1)) && fabs(h(0))<=fabs(h(2)))
-        h(0)= 1.0;
-    else if (fabs(h(1))<=fabs(h(0)) && fabs(h(1))<=fabs(h(2)))
-        h(1)= 1.0;
-    else
-        h(2)= 1.0;
-
-
-    Vector3f x = (h * y).normalize(); //check - replace * with ^
-    Vector3f z = (x * y).normalize(); //check - replace * with ^
-
-    Vector3f direction = xs * x + ys * y + zs * z;
-    direction.normalize();
-    return direction;
-}
-*/

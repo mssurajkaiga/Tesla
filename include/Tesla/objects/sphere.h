@@ -6,13 +6,12 @@
 
 class Sphere: public Object {
 private:
-	Vector3f center;
-	double radius;
+	Point center;
+	Real radius;
 
 public:
-	Sphere();
-	Sphere(const Vector3f &c, double r);
-	bool intersects(Ray &r, Intersection* i);
+	Sphere(Point c = Point(0., 0., 0.), Real r = 1.0, Material *mat = NULL, bool il = false);
+	bool intersects(const Ray &r, Intersection* i = NULL) const;
 	void setBBox();
 	Vector3f sample() const;
 };

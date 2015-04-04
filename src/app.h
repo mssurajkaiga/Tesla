@@ -2,10 +2,10 @@
 #ifndef HEADER_SRC_APP_H_INCLUDED
 #define HEADER_SRC_APP_H_INCLUDED
 
-#include <QtCore>
-#include <QtGui>
-#include <log4cxx/logger.h>
-#include <boost/shared_ptr.hpp>
+#include <QtCore/QtCore>
+#include <QtGui/QtGui>
+//#include <Tesla/util/logger.h>
+#include <memory> //#include <boost/shared_ptr.hpp>
 
 class App : public QApplication
 {
@@ -49,14 +49,14 @@ class App : public QApplication
         std::string getKeyRepr(const std::string& key)const;
         std::string convert(const QString& str)const;
         QString convert(const std::string& str)const;
-        
+		void setLogger(const char* log_file);
         
         static App* _instance;
-        static log4cxx::LoggerPtr _logger;
+        //Logger* _logger = NULL;
         QString _invocation;
         bool _gui;
         bool _interactive;
-        boost::shared_ptr<QMainWindow> _mainwindow;
+		std::shared_ptr<QMainWindow> _mainwindow; //boost::shared_ptr<QMainWindow> _mainwindow;
         
         QImage myImage;
         QLabel* render;

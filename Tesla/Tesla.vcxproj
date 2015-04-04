@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3654C82B-F871-4833-B638-413BC45DBC36}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Tesla</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\log4cxx\include;C:\Qt\4.8.6\include;C:\Users\M S Suraj\Documents\Visual Studio 2013\Projects\Tesla\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\Qt\4.8.6\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\log4cxx\include;C:\Qt\4.8.6\include;C:\Users\M S Suraj\Documents\Visual Studio 2013\Projects\Tesla\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\bsdftype.cpp" />
+    <ClCompile Include="..\src\cosinesampler.cpp" />
+    <ClCompile Include="..\src\film.cpp" />
+    <ClCompile Include="..\src\intersection.cpp" />
+    <ClCompile Include="..\src\light.cpp" />
+    <ClCompile Include="..\src\material.cpp" />
+    <ClCompile Include="..\src\mattematerial.cpp" />
+    <ClCompile Include="..\src\perspectivecamera.cpp" />
+    <ClCompile Include="..\src\quad.cpp" />
+    <ClCompile Include="..\src\quadlight.cpp" />
+    <ClCompile Include="..\src\simpleaggregrate.cpp" />
+    <ClCompile Include="..\src\bbox.cpp" />
+    <ClCompile Include="..\src\lambertian.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\object.cpp" />
+    <ClCompile Include="..\src\pathtracer.cpp" />
+    <ClCompile Include="..\src\pointlight.cpp" />
+    <ClCompile Include="..\src\ptintegrator.cpp" />
+    <ClCompile Include="..\src\scene.cpp" />
+    <ClCompile Include="..\src\sphere.cpp" />
+    <ClCompile Include="..\src\stratifiedimagesampler.cpp" />
+    <ClCompile Include="..\src\triangle.cpp" />
+    <ClCompile Include="..\src\trianglemesh.cpp" />
+    <ClCompile Include="..\src\uniformimagesampler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Tesla\bsdfs\bsdf.h" />
+    <ClInclude Include="..\include\Tesla\bsdfs\bsdftype.h" />
+    <ClInclude Include="..\include\Tesla\bsdfs\lambertian.h" />
+    <ClInclude Include="..\include\Tesla\cameras\camera.h" />
+    <ClInclude Include="..\include\Tesla\cameras\perspectivecamera.h" />
+    <ClInclude Include="..\include\Tesla\core\core.h" />
+    <ClInclude Include="..\include\Tesla\core\intersection.h" />
+    <ClInclude Include="..\include\Tesla\core\randomizer.h" />
+    <ClInclude Include="..\include\Tesla\core\ray.h" />
+    <ClInclude Include="..\include\Tesla\core\scene.h" />
+    <ClInclude Include="..\include\Tesla\core\spectrum.h" />
+    <ClInclude Include="..\include\Tesla\films\film.h" />
+    <ClInclude Include="..\include\Tesla\filters\filter.h" />
+    <ClInclude Include="..\include\Tesla\integrators\integrator.h" />
+    <ClInclude Include="..\include\Tesla\integrators\path.h" />
+    <ClInclude Include="..\include\Tesla\integrators\ptintegrator.h" />
+    <ClInclude Include="..\include\Tesla\integrators\surfaceintegrator.h" />
+    <ClInclude Include="..\include\Tesla\lights\arealight.h" />
+    <ClInclude Include="..\include\Tesla\lights\light.h" />
+    <ClInclude Include="..\include\Tesla\lights\lights.h" />
+    <ClInclude Include="..\include\Tesla\lights\pointlight.h" />
+    <ClInclude Include="..\include\Tesla\lights\quadlight.h" />
+    <ClInclude Include="..\include\Tesla\materials\material.h" />
+    <ClInclude Include="..\include\Tesla\materials\mattematerial.h" />
+    <ClInclude Include="..\include\Tesla\objects\aggregrate.h" />
+    <ClInclude Include="..\include\Tesla\objects\bbox.h" />
+    <ClInclude Include="..\include\Tesla\objects\quad.h" />
+    <ClInclude Include="..\include\Tesla\objects\trianglemesh.h" />
+    <ClInclude Include="..\include\Tesla\objects\object.h" />
+    <ClInclude Include="..\include\Tesla\objects\objects.h" />
+    <ClInclude Include="..\include\Tesla\objects\simpleaggregrate.h" />
+    <ClInclude Include="..\include\Tesla\objects\sphere.h" />
+    <ClInclude Include="..\include\Tesla\objects\triangle.h" />
+    <ClInclude Include="..\include\Tesla\objects\vertex.h" />
+    <ClInclude Include="..\include\Tesla\renderers\pathtracer.h" />
+    <ClInclude Include="..\include\Tesla\renderers\renderer.h" />
+    <ClInclude Include="..\include\Tesla\samplers\cosinesampler.h" />
+    <ClInclude Include="..\include\Tesla\samplers\directionsampler.h" />
+    <ClInclude Include="..\include\Tesla\samplers\filmsample.h" />
+    <ClInclude Include="..\include\Tesla\samplers\imagesample.h" />
+    <ClInclude Include="..\include\Tesla\samplers\imagesampler.h" />
+    <ClInclude Include="..\include\Tesla\samplers\sample.h" />
+    <ClInclude Include="..\include\Tesla\samplers\sampler.h" />
+    <ClInclude Include="..\include\Tesla\samplers\stratifiedimagesampler.h" />
+    <ClInclude Include="..\include\Tesla\samplers\uniformimagesampler.h" />
+    <ClInclude Include="..\include\Tesla\util\imagewriter.h" />
+    <ClInclude Include="..\include\Tesla\util\logger.h" />
+    <ClInclude Include="..\include\Tesla\util\exr.h" />
+    <ClInclude Include="..\src\app.h" />
+    <ClInclude Include="..\src\appinfo.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

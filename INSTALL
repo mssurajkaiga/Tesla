@@ -17,6 +17,8 @@
     http://www.opentissue.org/wikitissue/index.php/Using_CMake
     
     NOTE: Select the "build" folder as the location to build the binaries.
+	Also, use the following add-in for Qt 4 ->
+	http://download.qt-project.org/official_releases/vsaddin/qt-vs-addin-1.1.11-opensource.exe
     
 == Mac OS X ==
 

@@ -1,69 +1,64 @@
 #include <Tesla/objects/sphere.h>
+#include <utility>
 
-Sphere::Sphere() {
-	center = Vector3f(0., 0., 0.);
-	radius = 1.0;
-	this->setBBox();
+Sphere::Sphere(Point c, Real r, Material *mat, bool il) : Object(mat, il), center(c), radius(r) {
+	setBBox();
 }
 
-Sphere::Sphere(const Vector3f &c, double r) {
-	center = c;
-	radius = r;
-	this->setBBox();
-}
-
-bool Sphere::intersects(Ray &r, Intersection* i) {
+bool Sphere::intersects(const Ray &r, Intersection* i) const {
 	if (!bbox.intersects(r)) {
 		return false;
 	}
 
-	double A,B,C,D, t_hit;
+	Real A,B,C,D, t_hit = INFINITY;
 	A = r.direction.squaredNorm();
 	B = r.direction.dot(2 * (r.origin - center));
 	Vector3f t = r.origin - center;
-	C = t.squaredNorm() - radius*radius;
+	C = t.dot(t) - radius*radius;
 
-	D = B * B - 4 * A * C; /* discriminant for calculating if intersection occurs or not */
+	D = B * B - 4.f * A * C; /* discriminant for calculating if intersection occurs or not */
 
 	if (D<0) {
-		t_hit = INFINITY;
 		return false;
 	}
 
 	else if (D==0) {
-		t_hit = -B/(2*A);
+		t_hit = -0.5 * B / A;
 	}
 
 	else {
-		double t1 = (-B-sqrt(D))/(2*A);
-		double t2 = (-B+sqrt(D))/(2*A);
+		Real q;
+		if (B < 0.) 
+			q = -0.5 * (B - sqrtf(D));
+		else
+			q = -0.5 * (B + sqrtf(D));
 
-		if (t1 < r.t_min && t2 >= r.t_min) {
-			if (t2 <= r.t_max) {
-				t_hit = t2;
-			}
-			else {
+		Real t1 = q / A;
+		Real t2 = C / q;
+
+		if (t1 > t2) {
+			std::swap(t1, t2);
+		}
+
+		if (t1 > r.t_max || t2 < r.t_min) {
+			return false;
+		}
+
+		t_hit = t1;
+		if (t1 < r.t_min) {
+			t_hit = t2;
+			if (t2 > r.t_max) {
 				t_hit = INFINITY;
 				return false;
 			}
 		}
 
-		else if (t1>=r.t_min && t1<=r.t_max) {
-			t_hit = t1;
-		}
-
-		else {
-			t_hit = INFINITY;
-			return false;
-		}
-
 		if (i) {
 			i->t = t_hit;
 			i->point = r.origin + t_hit * r.direction;
-			/* calculate i.normal */
 			i->normal = i->point - center;
 			i->normal.normalize();
-			i->object = this;
+			i->object = (Object*)this;
 		}
 
 		return true;
@@ -72,7 +67,7 @@ bool Sphere::intersects(Ray &r, Intersection* i) {
 }
 
 void Sphere::setBBox() {
-	this->bbox = BBox(center-Vector3f(radius, radius, radius), center+Vector3f(radius, radius, radius));
+	this->bbox = BBox(center-Point(radius, radius, radius), center+Point(radius, radius, radius));
 }
 
 /* to do */

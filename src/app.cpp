@@ -4,10 +4,6 @@
 #include <exception>
 #include <stdexcept>
 #include <memory>
-#include <log4cxx/logger.h>
-#include <log4cxx/level.h>
-#include <log4cxx/consoleappender.h>
-#include <log4cxx/patternlayout.h>
 #include "app.h"
 #include "appinfo.h"
 
@@ -53,8 +49,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
     setOrganizationDomain(APPLICATION_VENDOR_URL);
     
     // Configure the logging mechanism
-    log4cxx::LoggerPtr rootlogger = log4cxx::Logger::getRootLogger();
-    rootlogger->addAppender(new log4cxx::ConsoleAppender(new log4cxx::PatternLayout("[%-5p] %m%n")));
+	//_logger = new Logger("default.log");
     
     // Parse the commandline
     int idx = 1;
@@ -72,7 +67,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
         }else if ( matches_option(arg,"prefset") ){
             // Verify that there is another argument
             if ( (idx+1) >= argc ){
-                LOG4CXX_FATAL(_logger,"Option \"" << arg << "\" requires a parameter.");
+                //_logger-<log_fatal("Option \"%s\" requires a parameter.", arg);
                 std::exit(1);
             }
             
@@ -97,7 +92,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
         }else if ( matches_option(arg,"prefdel") ){
             // Verify that there is another argument
             if ( (idx+1) >= argc ){
-                LOG4CXX_FATAL(_logger,"Option \"" << arg << "\" requires a parameter.");
+                //_logger-<log_fatal("Option \"%s\" requires a parameter.", arg);
                 std::exit(1);
             }
             
@@ -116,7 +111,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
         }else if ( matches_option(arg,"prefget") ){
             // Verify that there is another argument
             if ( (idx+1) >= argc ){
-                LOG4CXX_FATAL(_logger,"Option \"" << arg << "\" requires a parameter.");
+                //_logger-<log_fatal("Option \"%s\" requires a parameter.", arg);
                 std::exit(1);
             }
             
@@ -132,7 +127,7 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
         }else if ( matches_option(arg,"loglevel") ){
             // Verify that there is another argument
             if ( (idx+1) >= argc ){
-                LOG4CXX_FATAL(_logger,"Option \"" << arg << "\" requires a parameter.");
+                //_logger-<log_fatal("Option \"%s\" requires a parameter.", arg);
                 std::exit(1);
             }
             
@@ -147,33 +142,30 @@ App::App(int& argc, char** argv) : QApplication(argc,argv), _invocation(argv[0])
             if ( eqidx != std::string::npos ){
                 std::string logger = param.substr(0,eqidx);
                 std::string level  = param.substr(eqidx+1);
-                setLogLevel(logger,level);
-            }else{
-                setLogLevel("",param);
             }
         }else if ( matches_option(arg,"appid") || matches_option(arg,"application-identifier") ){
             printApplicationIdentifier();
             std::exit(0);
         }else if ( matches_option(arg,"gui") ){
             if ( _interactive ){
-                LOG4CXX_FATAL(_logger,"Cannot specify both \"--gui\" and \"--interactive\" simultaneously.");
+                //_logger-<log_fatal("Cannot specify both \"--gui\" and \"--interactive\" simultaneously.");
                 std::exit(1);
             }
             if ( _gui ){
-                LOG4CXX_WARN(_logger,"Option \"" << arg << "\" already specified. Ignoring.");
+				//_logger-<log_warning("Option \"%s\" already specified. Ignoring.", arg);
             }
             _gui = true;
         }else if ( matches_option(arg,"interactive") ){
             if ( _gui ){
-                LOG4CXX_FATAL(_logger,"Cannot specify both \"--gui\" and \"--interactive\" simultaneously.");
+                //_logger-<log_fatal("Cannot specify both \"--gui\" and \"--interactive\" simultaneously.");
                 std::exit(1);
             }
             if ( _interactive ){
-                LOG4CXX_WARN(_logger,"Option \"" << arg << "\" already specified. Ignoring.");
+                //_logger-<log_warning("Option \"%s\" already specified. Ignoring.", arg);
             }
             _interactive = true;
         }else{
-            LOG4CXX_WARN(_logger,"Unrecognized option: \"" << arg << "\". Ignoring");
+            //_logger-<log_warning("Unrecognized option: \"%s\". Ignoring", arg);
         }
         idx++;
     }
@@ -434,37 +426,6 @@ App::printAllPreferences()const
     }
 }
 
-void 
-App::setLogLevel(const std::string& logger, const std::string& level)
-{
-    log4cxx::LoggerPtr loggerptr = ((logger=="")?(log4cxx::Logger::getRootLogger()):(log4cxx::Logger::getLogger(logger)));
-    std::string lowercaselevel(level);
-    for ( size_t i = 0; i < lowercaselevel.size(); i++ ){
-        lowercaselevel[i] = std::tolower(lowercaselevel[i]);
-    }
-    
-    if ( lowercaselevel == "all" ){
-        loggerptr->setLevel(log4cxx::Level::getAll());
-    }else if ( lowercaselevel == "trace" ){
-        loggerptr->setLevel(log4cxx::Level::getTrace());
-    }else if ( lowercaselevel == "debug" ){
-        loggerptr->setLevel(log4cxx::Level::getDebug());
-    }else if ( lowercaselevel == "info" ){
-        loggerptr->setLevel(log4cxx::Level::getInfo());
-    }else if ( lowercaselevel == "warn" ){
-        loggerptr->setLevel(log4cxx::Level::getWarn());
-    }else if ( lowercaselevel == "error" ){
-        loggerptr->setLevel(log4cxx::Level::getError());
-    }else if ( lowercaselevel == "fatal" ){
-        loggerptr->setLevel(log4cxx::Level::getFatal());
-    }else if ( (lowercaselevel == "off")  || (lowercaselevel == "none") ){
-        loggerptr->setLevel(log4cxx::Level::getOff());
-    }else{
-        LOG4CXX_FATAL(_logger,"Unrecognized logging level: \"" << level << "\".");
-        std::exit(1);
-    }
-}
-
 std::string 
 App::convert(const QString& str)const
 {
@@ -482,6 +443,3 @@ App::convert(const std::string& str)const
 
 App*
 App::_instance = 0;
-
-log4cxx::LoggerPtr
-App::_logger = log4cxx::Logger::getLogger("App");
