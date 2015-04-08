@@ -1,6 +1,14 @@
 #include <Tesla/objects/object.h>
 #include <Tesla/materials/mattematerial.h>
 
+Object::Object(Material *mat, LightSource* l) : material(mat), lightsource(l) { 
+	if (lightsource)
+		islight = true;
+	else
+		islight = false;
+	setBBox(); 
+}
+
 void Object::setMaterial(Material *mat) {
 	material = mat;
 }
@@ -16,6 +24,10 @@ Material* Object::getMaterial() {
 
 bool Object::isLight() const {
 	return islight;
+}
+
+LightSource* Object::getLightSource() const {
+	return lightsource;
 }
 
 BBox* Object::getBBox() {

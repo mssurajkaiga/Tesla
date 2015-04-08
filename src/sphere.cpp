@@ -1,7 +1,7 @@
 #include <Tesla/objects/sphere.h>
 #include <utility>
 
-Sphere::Sphere(Point c, Real r, Material *mat, bool il) : Object(mat, il), center(c), radius(r) {
+Sphere::Sphere(Point c, Real r, Material *mat) : Object(mat), center(c), radius(r) {
 	setBBox();
 }
 

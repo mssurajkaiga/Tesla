@@ -1,7 +1,7 @@
 #ifndef AREALIGHT_H
 #define AREALIGHT_H
 
-#include <Tesla/lights/light.h>
+#include <Tesla/lights/lightsource.h>
 
 /* 
 Represents a general area light.

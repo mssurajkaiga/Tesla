@@ -1,7 +1,7 @@
 #include <Tesla/objects/trianglemesh.h>
 #include <Tesla/objects/triangle.h>
 
-TriangleMesh::TriangleMesh(int nv, int nt, int *ind, Vertex *ver, Material *mat, bool il) : Object(mat, il), numvertices(nv), numtriangles(nt) {
+TriangleMesh::TriangleMesh(int nv, int nt, int *ind, Vertex *ver, Material *mat, LightSource *l) : Object(mat, l), numvertices(nv), numtriangles(nt) {
 	for (int i = 0; i < nv; i++) {
 		vertices[i].object = (TriangleMesh*) this;
 	}
@@ -18,9 +18,7 @@ void TriangleMesh::setBBox() {
 bool TriangleMesh::intersects(const Ray &ray, Intersection* inter) const {
 	/* the first time its called, generate all triangles and cache it for reuse */
 	if (!cache) {
-		(Triangle*) (this->cache) = new Triangle[numtriangles];
-		for (int i = 0; i < numtriangles; i++) 
-			cache[i] = Triangle((TriangleMesh*)this, &indices[3 * i]);
+		generateCache();
 	}
 
 	Intersection in, temp;
@@ -44,4 +42,19 @@ bool TriangleMesh::intersects(const Ray &ray, Intersection* inter) const {
 	}
 
 	return false;
+}
+
+void TriangleMesh::generateCache() const {
+	area = 0.;
+	(Triangle*)(this->cache) = new Triangle[numtriangles];
+	for (int i = 0; i < numtriangles; i++) {
+		cache[i] = Triangle((TriangleMesh*)this, &indices[3 * i]);
+		area += cache[i].getArea();
+	}
+}
+
+Real TriangleMesh::getArea() const{
+	if (!cache)
+		generateCache();
+	return area;
 }

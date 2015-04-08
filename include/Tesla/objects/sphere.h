@@ -10,7 +10,7 @@ private:
 	Real radius;
 
 public:
-	Sphere(Point c = Point(0., 0., 0.), Real r = 1.0, Material *mat = NULL, bool il = false);
+	Sphere(Point c = Point(0., 0., 0.), Real r = 1.0, Material *mat = NULL);
 	bool intersects(const Ray &r, Intersection* i = NULL) const;
 	void setBBox();
 	Vector3f sample() const;

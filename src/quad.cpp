@@ -1,6 +1,6 @@
 #include <Tesla/objects/quad.h>
 
-Quad::Quad(Point a, Point b, Point c, Point d, Material *mat, bool il) {
+Quad::Quad(Point a, Point b, Point c, Point d, Material *mat, LightSource *l) {
 	numvertices = 4;
 	numtriangles = 2;
 	indices = new int[6];
@@ -18,5 +18,9 @@ Quad::Quad(Point a, Point b, Point c, Point d, Material *mat, bool il) {
 	vertices[2] = Vertex(c, normal, this);
 	vertices[3] = Vertex(d, normal, this);
 	material = mat;
-	islight = il;
+	lightsource = l;
+	if (lightsource)
+		islight = true;
+	else
+		islight = false;
 }

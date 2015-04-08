@@ -30,3 +30,5 @@
 #Project files
 [Bb]uild/
 [Bb]in/
+Release/
+Debug/

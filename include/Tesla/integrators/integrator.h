@@ -6,6 +6,14 @@
 #include <Tesla/core/scene.h>
 #include <Tesla/renderers/renderer.h>
 
+enum TerminationCriterion {
+	RUSSIAN_ROULETTE, MAX_DEPTH, BOTH
+};
+
+enum Illumination {
+	DIRECT, INDIRECT, GLOBAL
+};
+
 class Integrator
 {
 public:

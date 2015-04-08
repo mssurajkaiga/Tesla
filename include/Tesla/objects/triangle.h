@@ -16,6 +16,8 @@ public:
 	Triangle(TriangleMesh* mesh = NULL, int *i = NULL) : trianglemesh(mesh), indices(i) { setBBox();}
 	bool intersects(const Ray &ray, Intersection* inter) const;
 	void setBBox();
+	Real getArea() const;
+	Spectrum getSample(const Vector3f &point, Point &sample, Real &pdf) const;
 };
 
 #endif

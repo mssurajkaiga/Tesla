@@ -2,24 +2,30 @@
 #include <Tesla/objects/simpleaggregrate.h>
 #include <Tesla/core/randomizer.h>
 
-Scene::Scene(std::vector<Object*> o, std::vector<Light*> l) : lights(l) {
-	lpdf = 1. / lights.size();
-	this->buildKdtree(o, l);
+Scene::Scene() {
+	/* 
+	todo - build kdtree and set it to aggregrate pointer
+	for now, use simple aggregrate
+	*/
+	aggregrate = new SimpleAggregrate;
 }
 
 bool Scene::intersects(const Ray &ray, Intersection *inter) const {
 	return aggregrate->intersects(ray, inter);
 }
 
-void Scene::buildKdtree(std::vector<Object*> o, std::vector<Light*>  l) {
-	/* 
-	todo - build kdtree and set it to aggregrate pointer
-	for now, use simple aggregrate
-	*/
-	aggregrate = new SimpleAggregrate(o, l);
+LightSource* Scene::getLightSource(Real &pdf) {
+	return aggregrate->getLightSource(pdf);
 }
 
-Light* Scene::getLight(Real &pdf) {
-	pdf = lpdf;
-	return lights[rand() % lights.size()];
+Object* Scene::getLight(Real &pdf) {
+	return aggregrate->getLight(pdf);
+}
+
+void Scene::add(Object *obj) {
+	aggregrate->add(obj);
+}
+
+void Scene::add(LightSource *light){
+	aggregrate->add(light);
 }

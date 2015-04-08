@@ -3,9 +3,10 @@
 #include <Tesla/bsdfs/bsdf.h>
 #include <iostream>
 
-PTIntegrator::PTIntegrator(TerminationCriterion tc = MAX_DEPTH, int md = 5) {
+PTIntegrator::PTIntegrator(int md, TerminationCriterion tc, Illumination i) {
 	this->tc = tc;
 	this->max_depth = md;
+	this->illumination = i;
 }
 
 Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, Renderer *renderer, ImageSample *imagesample) const {
@@ -21,19 +22,21 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 
 	Spectrum ld(0., 0., 0.), f(0., 0., 0.);
 	Real lpdf = 1.;
-	Light *l;
+	Object *l = NULL;
+	Point samplelocation;
 	Vector3f direction;
 	Real pdf = 1.;
-	/* check if terminal vertex is a light. If so, no need to calculate direct lighting from other lights here */
-	if (edge1->begin->object->isLight()) {
-		l = (Light*)edge1->begin->object;
-		ld = l->getIntensity(edge1->begin->position);
+	bool islight = false;
+	/* check if terminal vertex is a light. If so, no need to calculate direct lighting from other lights here and
+	 at the next vertex, this light source should not be shadow connected. use islight flag and comparison at next vertex. */
+	if (islight = edge1->begin->object->isLight()) {
+		ld = edge1->begin->object->getLightSource()->getIntensity(edge1->begin->position);
 	}
 
 	/* else calculate the direct lighting at non-light terminal vertex */
-	else {
-		l = scene->getLight(lpdf);
-		Spectrum s = l->getSample(edge1->begin->position, direction, pdf);
+	else if ((illumination != INDIRECT) && (l = scene->getLight(lpdf))) {
+		Spectrum s = l->getSample(edge1->begin->position, samplelocation, pdf);
+		direction = samplelocation - edge1->begin->position;
 		if (!scene->intersects(Ray(edge1->begin->position, direction))){ //shadow ray intersection
 			ld += s / (pdf * lpdf);
 			f = edge1->begin->object->getMaterial()->eval(edge1->direction, direction); //check directions
@@ -46,19 +49,27 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 	while(edge2 = path.get_edge_backward()) {
 		/* calculate direct lighting contribution */
 		ld = Spectrum(0., 0., 0.);
-		Real lpdf = 1.;
-		Light *l = scene->getLight(lpdf);
-		Spectrum s = l->getSample(edge2->begin->position, direction, pdf);
-		if (!scene->intersects(Ray(edge2->begin->position, direction))) { //shadow ray intersection
-			ld += s / (pdf * lpdf);
-			f = edge1->end->object->getMaterial()->eval(edge2->direction, direction); //check directions
-			ld *= f;
+		Object *lo;
+		if ((lo = scene->getLight(lpdf)) && !(lo == l && islight) && (illumination != INDIRECT)){
+			Spectrum s = lo->getSample(edge1->begin->position, samplelocation, pdf);
+			direction = samplelocation - edge1->begin->position;
+			if (!scene->intersects(Ray(edge2->begin->position, direction))) { //shadow ray intersection
+				ld += s / (pdf * lpdf);
+				f = edge1->end->object->getMaterial()->eval(edge2->direction, direction); //check directions
+				ld *= f;
+			}
+		}
+		/* calculate indirect lighting contribution */
+		if (illumination != DIRECT) {
+			f = edge1->end->object->getMaterial()->eval(edge2->direction, edge1->direction); //todo = -ve the directions as we are tracing backward
+			radiance = ld + f * radiance * edge2->direction.dot(edge1->end->normal) / (edge1->end->pdf * edge1->end->apdf);
+		}
+		else {
+			radiance = ld;
 		}
 
-		/* calculate indirect lighting contribution */
-		f = edge1->end->object->getMaterial()->eval(edge2->direction, edge1->direction); //todo = -ve the directions as we are tracing backward
-		radiance = ld + f * radiance * edge2->direction.dot(edge1->end->normal) / (edge1->end->pdf * edge1->end->apdf);
 		edge1 = edge2;
+		islight = false;
 	}
 
 	//todo - check if additional radiance is added at eye vertex

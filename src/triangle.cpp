@@ -1,4 +1,5 @@
 #include <Tesla/objects/triangle.h>
+#include <Tesla/core/randomizer.h>
 
 /* Shamelessly copied from pbrt! I'm very very shameless!! */
 
@@ -48,4 +49,29 @@ void Triangle::setBBox() {
 		return;
 	bbox = BBox(trianglemesh->vertices[indices[0]].position, trianglemesh->vertices[indices[1]].position);
 	bbox.merge(trianglemesh->vertices[indices[2]].position);
+}
+
+Real Triangle::getArea() const {
+	if (!trianglemesh)
+		return 0.;
+	Point p1 = trianglemesh->vertices[indices[0]].position;
+	Point p2 = trianglemesh->vertices[indices[1]].position;
+	Point p3 = trianglemesh->vertices[indices[2]].position;
+
+	return 0.5f * (p2 - p1).cross(p3 - p1).norm();
+}
+
+Spectrum Triangle::getSample(const Vector3f &point, Point &sample, Real &pdf) const {
+	Point p1 = trianglemesh->vertices[indices[0]].position;
+	Point p2 = trianglemesh->vertices[indices[1]].position;
+	Point p3 = trianglemesh->vertices[indices[2]].position;
+
+	/* generate uniformly distributed sample using barycentric coordinates */
+
+	Real b1 = 1 - sqrtf(ung.generateRandom());
+	Real b2 = 1 - sqrtf(ung.generateRandom());
+
+	sample = (1 - b1 - b2)*p1 + b1 * p2 + b2 * p3;
+	pdf = 1. / getArea();
+	return Spectrum(0., 0., 0.);
 }

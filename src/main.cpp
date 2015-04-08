@@ -8,7 +8,7 @@
 #include <Tesla/objects/sphere.h>
 #include <Tesla/objects/quad.h>
 #include <Tesla/objects/simpleaggregrate.h>
-#include <Tesla/lights/pointlight.h>
+#include <Tesla/lights/pointlightsource.h>
 #include <Tesla/lights/quadlight.h>
 #include <Tesla/cameras/perspectivecamera.h>
 #include <Tesla/materials/mattematerial.h>
@@ -28,9 +28,11 @@ int main(int argc, char* argv[])
 	int width = 100, height = 100, spp = 4;
 	bool jitter = false;
 	std::string filename = "output";
-	std::vector<Object*> objects;
-	std::vector<Light*> lights;
+	Scene scene;
 	Camera *camera = NULL;
+	int maxdepth = 5;
+	TerminationCriterion tc = MAX_DEPTH;
+	Illumination ill = GLOBAL;
 
 	if (argc < 2) {
 		BSDF *l1 = new Lambertian(Spectrum(1.0, 0.0, 0.0));
@@ -40,19 +42,40 @@ int main(int argc, char* argv[])
 
 		Sphere sph1(Vector3f(0., 0., -15.), 3.0);
 		sph1.setMaterial(&mm1);
-		objects.push_back(&sph1);
+		scene.add(&sph1);
 
 		Sphere sph2(Vector3f(-4., 2., -9.), 3.0);
 		sph2.setMaterial(&mm2);
-		objects.push_back(&sph2);
+		scene.add(&sph2);
 
-		lights.push_back(new PointLight(Vector3f(-4., 7., -9.), Spectrum(1.0, 1.0, 1.0), 100.));
+		scene.add(new PointLightSource(Vector3f(-4., 7., -9.), Spectrum(1.0, 1.0, 1.0), 100.));
 	}
 	
 	else {
 		std::string toparse;
 		for (int i = 1; i < argc; ++i) {
 			toparse = std::string(argv[i]);
+
+			if (toparse == "-maxdepth") {
+				maxdepth = atoi(argv[++i]);
+			}
+
+			if (toparse == "-russianroulette") {
+				tc = RUSSIAN_ROULETTE;
+			}
+
+			if (toparse == "-both") {
+				tc = BOTH;
+			}
+
+			if (toparse == "-direct") {
+				ill = DIRECT;
+			}
+
+			if (toparse == "-indirect") {
+				ill = INDIRECT;
+			}
+
 			if (toparse == "-width") {
 				width = atoi(argv[++i]);
 			}
@@ -86,7 +109,7 @@ int main(int argc, char* argv[])
 					sphere->setMaterial(mm);
 					--i;
 				}
-				objects.push_back(sphere);
+				scene.add(sphere);
 			}
 
 			if (toparse == "-quad") {
@@ -106,21 +129,21 @@ int main(int argc, char* argv[])
 					quad->setMaterial(mm);
 					--i;
 				}
-				objects.push_back(quad);
+				scene.add(quad);
 			}
 
-			if (toparse == "-pointlight") {
+			if (toparse == "-pointlightsource") {
 				++i;
-				PointLight *light = new PointLight(Vector3f(atof(argv[i]), atof(argv[i + 1]), atof(argv[i + 2])), Spectrum(atof(argv[i + 3]), atof(argv[i + 4]), atof(argv[i + 5])), atof(argv[i + 6]));
+				PointLightSource *lightsource = new PointLightSource(Vector3f(atof(argv[i]), atof(argv[i + 1]), atof(argv[i + 2])), Spectrum(atof(argv[i + 3]), atof(argv[i + 4]), atof(argv[i + 5])), atof(argv[i + 6]));
 				i += 6;
-				lights.push_back(light);
+				scene.add(lightsource);
 			}
 
 			if (toparse == "-quadlight") {
 				++i;
 				QuadLight *light = new QuadLight(Vector3f(atof(argv[i]), atof(argv[i + 1]), atof(argv[i + 2])), Vector3f(atof(argv[i + 3]), atof(argv[i + 4]), atof(argv[i + 5])), Vector3f(atof(argv[i + 6]), atof(argv[i + 7]), atof(argv[i + 8])), Vector3f(atof(argv[i + 9]), atof(argv[i + 10]), atof(argv[i + 11])), Spectrum(atof(argv[i + 12]), atof(argv[i + 13]), atof(argv[i + 14])), atof(argv[i + 15]));
 				i += 15;
-				lights.push_back(light);
+				scene.add(light);
 			}
 
 			if (toparse == "-filename") {
@@ -141,11 +164,10 @@ int main(int argc, char* argv[])
 	}
 
 	StratifiedImageSampler sis(0, width, 0, height, spp, jitter);
-	Scene s(objects, lights);
 	Film film(width, height, NULL);
-	PTIntegrator pti(MAX_DEPTH, 5);
+	PTIntegrator pti(maxdepth, tc, ill);
 	PathTracer pt(&sis, &pti, &film);
-	pt.render(&s, camera);
+	pt.render(&scene, camera);
 	film.save(filename, Film::HDR);
 	return 0;
 }
