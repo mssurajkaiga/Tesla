@@ -6,9 +6,11 @@ Sphere::Sphere(Point c, Real r, Material *mat) : Object(mat), center(c), radius(
 }
 
 bool Sphere::intersects(const Ray &r, Intersection* i) const {
+	/*
 	if (!bbox.intersects(r)) {
 		return false;
 	}
+	*/
 
 	Real A,B,C,D, t_hit = INFINITY;
 	A = r.direction.squaredNorm();

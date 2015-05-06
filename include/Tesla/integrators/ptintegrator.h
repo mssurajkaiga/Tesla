@@ -7,9 +7,9 @@
 class PTIntegrator : public SurfaceIntegrator
 {
 public:
-	PTIntegrator(int md = 10, TerminationCriterion tc = MAX_DEPTH, Illumination i = GLOBAL);
+	PTIntegrator(int min_depth = 1, int max_depth = 10, TerminationCriterion tc = MAX_DEPTH, Illumination i = GLOBAL);
 
-	int max_depth;
+	int min_depth, max_depth;
 	TerminationCriterion tc;
 	Illumination illumination;
 

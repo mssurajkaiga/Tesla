@@ -7,7 +7,7 @@
 #include <Tesla/renderers/renderer.h>
 
 enum TerminationCriterion {
-	RUSSIAN_ROULETTE, MAX_DEPTH, BOTH
+	RUSSIAN_ROULETTE, MAX_DEPTH
 };
 
 enum Illumination {

@@ -1,8 +1,8 @@
 #include <Tesla/materials/mattematerial.h>
+#include <Tesla/bsdfs/lambertian.h>
 
 MatteMaterial::MatteMaterial(Spectrum R) {
-	Lambertian l(R);
-	bsdfs[0] = &l;
+	bsdfs[0] = new Lambertian(R);
 	nbsdfs = 1;
 }
 

@@ -12,6 +12,7 @@
 #include <Tesla/lights/quadlight.h>
 #include <Tesla/cameras/perspectivecamera.h>
 #include <Tesla/materials/mattematerial.h>
+#include <Tesla/materials/mirrormaterial.h>
 #include <Tesla/samplers/stratifiedimagesampler.h>
 #include <Tesla/films/film.h>
 #include <iostream>
@@ -30,15 +31,13 @@ int main(int argc, char* argv[])
 	std::string filename = "output";
 	Scene scene;
 	Camera *camera = NULL;
-	int maxdepth = 5;
-	TerminationCriterion tc = MAX_DEPTH;
+	int mindepth = 2, maxdepth = 5;
+	TerminationCriterion tc = RUSSIAN_ROULETTE;
 	Illumination ill = GLOBAL;
 
 	if (argc < 2) {
-		BSDF *l1 = new Lambertian(Spectrum(1.0, 0.0, 0.0));
-		MatteMaterial mm1(&l1, 1);
-		BSDF *l2 = new Lambertian(Spectrum(0., 1.0, 1.0));
-		MatteMaterial mm2(&l2, 1);
+		MatteMaterial mm1(Spectrum(1.0, 0.0, 0.0));
+		MatteMaterial mm2(Spectrum(0., 1.0, 1.0));
 
 		Sphere sph1(Vector3f(0., 0., -15.), 3.0);
 		sph1.setMaterial(&mm1);
@@ -60,12 +59,12 @@ int main(int argc, char* argv[])
 				maxdepth = atoi(argv[++i]);
 			}
 
-			if (toparse == "-russianroulette") {
-				tc = RUSSIAN_ROULETTE;
+			if (toparse == "-mindepth") {
+				mindepth = atoi(argv[++i]);
 			}
 
-			if (toparse == "-both") {
-				tc = BOTH;
+			if (toparse == "-russianroulette") {
+				tc = RUSSIAN_ROULETTE;
 			}
 
 			if (toparse == "-direct") {
@@ -97,15 +96,18 @@ int main(int argc, char* argv[])
 				Sphere *sphere = new Sphere(Vector3f(atof(argv[i]), atof(argv[i + 1]), atof(argv[i + 2])), atof(argv[i + 3]));
 				i += 4;
 				toparse = std::string(argv[i]);
-				if (toparse == "-rgb") {
-					BSDF *lambertian = new Lambertian(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
-					MatteMaterial *mm = new MatteMaterial(&lambertian, 1);
+				if (toparse == "-rgb" || toparse == "-rgb-matte") {
+					MatteMaterial *mm = new MatteMaterial(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
+					sphere->setMaterial(mm);
+					i += 3;
+				}
+				else if (toparse == "-rgb-mirror") {
+					MirrorMaterial *mm = new MirrorMaterial(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
 					sphere->setMaterial(mm);
 					i += 3;
 				}
 				else {
-					BSDF *lambertian = new Lambertian(Spectrum(1.0, 1.0, 1.0));
-					MatteMaterial *mm = new MatteMaterial(&lambertian, 1);
+					MatteMaterial *mm = new MatteMaterial(Spectrum(1.0, 1.0, 1.0));
 					sphere->setMaterial(mm);
 					--i;
 				}
@@ -118,14 +120,12 @@ int main(int argc, char* argv[])
 				i += 12;
 				toparse = std::string(argv[i]);
 				if (toparse == "-rgb") {
-					BSDF *lambertian = new Lambertian(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
-					MatteMaterial *mm = new MatteMaterial(&lambertian, 1);
+					MatteMaterial *mm = new MatteMaterial(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
 					quad->setMaterial(mm);
 					i += 3;
 				}
 				else {
-					BSDF *lambertian = new Lambertian(Spectrum(1.0, 1.0, 1.0));
-					MatteMaterial *mm = new MatteMaterial(&lambertian, 1);
+					MatteMaterial *mm = new MatteMaterial(Spectrum(1.0, 1.0, 1.0));
 					quad->setMaterial(mm);
 					--i;
 				}
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
 
 	StratifiedImageSampler sis(0, width, 0, height, spp, jitter);
 	Film film(width, height, NULL);
-	PTIntegrator pti(maxdepth, tc, ill);
+	PTIntegrator pti(mindepth, maxdepth, tc, ill);
 	PathTracer pt(&sis, &pti, &film);
 	pt.render(&scene, camera);
 	film.save(filename, Film::HDR);

@@ -2,7 +2,6 @@
 #define MATTEMATERIAL_H
 
 #include <Tesla/materials/material.h>
-#include <Tesla/bsdfs/lambertian.h>
 
 class MatteMaterial : public Material {
 public:

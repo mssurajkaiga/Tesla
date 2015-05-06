@@ -5,7 +5,7 @@
 
 PathTracer::PathTracer(ImageSampler *sampler, Integrator *i, Film* f) : Renderer(f), imagesampler(sampler), integrator(i) {
 	if (!integrator) {
-		integrator = new PTIntegrator(10, RUSSIAN_ROULETTE, GLOBAL);
+		integrator = new PTIntegrator(1, 10, RUSSIAN_ROULETTE, GLOBAL);
 	}
 	if (!sampler) {
 		sampler = new UniformImageSampler;

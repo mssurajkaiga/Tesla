@@ -6,7 +6,7 @@
 #include <vector>
 
 /*
-Represents a (currently surface) vertex on a path.
+Represents a vertex on a path; only surface vertices supported now.
 Position, Normal and the object/light on which the point resides.
 Pdf represents the pdf with which the next edge was generated.
 Apdf represents any additional pdfs computed such as from russian roulette termination.

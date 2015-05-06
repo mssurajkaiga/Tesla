@@ -3,9 +3,10 @@
 #include <Tesla/bsdfs/bsdf.h>
 #include <iostream>
 
-PTIntegrator::PTIntegrator(int md, TerminationCriterion tc, Illumination i) {
+PTIntegrator::PTIntegrator(int min_depth, int max_depth, TerminationCriterion tc, Illumination i) {
 	this->tc = tc;
-	this->max_depth = md;
+	this->min_depth = min_depth;
+	this->max_depth = max_depth;
 	this->illumination = i;
 }
 
@@ -28,7 +29,8 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 	Real pdf = 1.;
 	bool islight = false;
 	/* check if terminal vertex is a light. If so, no need to calculate direct lighting from other lights here and
-	 at the next vertex, this light source should not be shadow connected. use islight flag and comparison at next vertex. */
+	 at the next vertex, this light source should not be shadow connected. use islight flag and comparison at next vertex. 
+	 Update: currently, this vertex may be shadow connected at next vertex */
 	if (islight = edge1->begin->object->isLight()) {
 		ld = edge1->begin->object->getLightSource()->getIntensity(edge1->begin->position);
 	}
@@ -50,7 +52,7 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 		/* calculate direct lighting contribution */
 		ld = Spectrum(0., 0., 0.);
 		Object *lo;
-		if ((lo = scene->getLight(lpdf)) && !(lo == l && islight) && (illumination != INDIRECT)){
+		if ((lo = scene->getLight(lpdf)) && (illumination != INDIRECT)){
 			Spectrum s = lo->getSample(edge1->begin->position, samplelocation, pdf);
 			direction = samplelocation - edge1->begin->position;
 			if (!scene->intersects(Ray(edge2->begin->position, direction))) { //shadow ray intersection
@@ -83,22 +85,40 @@ Path PTIntegrator::generatePath(Ray* ray, Scene* scene) const {
 
 	Ray r = *ray;
 	Material *mat;
-	Real sp = 0.5; //russian roulette survival probability
+	Real apdf = 1., sp = 0.75; //russian roulette survival probability
 	int bounces = 1;
 
 	while (1) {
 		bool terminate = false;
+
+		Real random;
+		/* termination based on criterion */
+		switch (this->tc) {
+			case RUSSIAN_ROULETTE:
+				if (bounces > min_depth) {
+					random = ung.generateRandom();
+					if (random > sp){
+						terminate = true;
+						apdf = sp;
+					}
+				}
+				break;
+
+			case MAX_DEPTH:
+				if (bounces == max_depth)
+					terminate = true;
+				break;
+		}
 
 		Intersection is;
 		if (!scene->intersects(r, &is)) {
 			return path;
 		}
 
-		
-		/* If intersection is light, path should be terminated */
-		if (is.object->isLight()) {
+		/* If intersection is light or termination check succeeds, path should be terminated */
+		if (is.object->isLight() || terminate) {
 			path.add_vertex(PathVertex(&is));
-			return path;
+			break;
 		}
 
 		/* Importance sampling brdf to get new direction */
@@ -107,38 +127,14 @@ Path PTIntegrator::generatePath(Ray* ray, Scene* scene) const {
 		Real pdf; // sampled pdf value
 
 		mat->sample(r.direction, wi, is.normal, pdf);
-		path.add_vertex(PathVertex(&is, pdf));
-
-		Real random;
-		/* termination based on criterion */
-		switch (this->tc) {
-			case RUSSIAN_ROULETTE:
-				random = ung.generateRandom();
-				if (random > sp)
-					terminate = true;
-				break;
-
-			case MAX_DEPTH:
-				if (bounces == max_depth)
-					terminate = true;
-				break;
-
-			case BOTH:
-				if (bounces == max_depth)
-					terminate = true;
-				random = ung.generateRandom();
-				if (random > sp)
-					terminate = true;
-		}
-
-		if (terminate)
-			break;
-		++bounces;
+		path.add_vertex(PathVertex(&is, pdf, apdf));
 
 		/* update new ray in sampled direction */
 		r.direction = wi;
 		r.origin = is.point;
 		r.shift();
+
+		++bounces;
 	}
 
 	return path;
