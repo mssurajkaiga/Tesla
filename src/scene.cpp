@@ -2,12 +2,16 @@
 #include <Tesla/objects/simpleaggregrate.h>
 #include <Tesla/core/randomizer.h>
 
-Scene::Scene() {
+Scene::Scene(bool d) {
 	/* 
 	todo - build kdtree and set it to aggregrate pointer
 	for now, use simple aggregrate
 	*/
-	aggregrate = new SimpleAggregrate;
+	aggregrate = new SimpleAggregrate(d);
+}
+
+Scene::~Scene() {
+	delete aggregrate;
 }
 
 bool Scene::intersects(const Ray &ray, Intersection *inter) const {
@@ -23,6 +27,7 @@ Object* Scene::getLight(Real &pdf) {
 }
 
 void Scene::add(Object *obj) {
+	obj->setId(std::to_string(om.getId()));
 	aggregrate->add(obj);
 }
 

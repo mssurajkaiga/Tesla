@@ -15,9 +15,10 @@ protected:
 	std::vector<LightSource*> lightsources; // for independent light-sources like pointlightsource
 public:
 
-	SimpleAggregrate() {}
+	SimpleAggregrate(bool d = false) : Aggregrate(d) {}
 	SimpleAggregrate(std::vector<Object*> o) : objects(o) { setBBox(); }
 	SimpleAggregrate(std::vector<Object*> o, std::vector<LightSource*> l) : objects(o), lightsources(l) { setBBox(); }
+	~SimpleAggregrate();
 	bool intersects(const Ray &ray, Intersection* inter);
 	BBox* getBBox();
 	void setBBox();

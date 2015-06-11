@@ -10,8 +10,9 @@ class PathTracer : public Renderer
 protected:
 	ImageSampler *imagesampler;
 	Integrator *integrator;
+
 public:
-	PathTracer(ImageSampler *sampler = NULL, Integrator *i = NULL, Film* f = NULL);
+	PathTracer(ImageSampler *sampler, Integrator *i, Film* f) : imagesampler(sampler), integrator(i), Renderer(f) {}
 	void render(Scene* scene, Camera *camera);
 	bool getIntersection(Scene *scene, Ray r, Intersection* intersection);
 };

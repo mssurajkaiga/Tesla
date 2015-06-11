@@ -7,17 +7,19 @@
 
 /*
 Represents a vertex on a path; only surface vertices supported now.
-Position, Normal and the object/light on which the point resides.
-Pdf represents the pdf with which the next edge was generated.
-Apdf represents any additional pdfs computed such as from russian roulette termination.
+<position>, <normal> and the <object>/<light> on which the point resides.
+<data> can be any additional data. For path tracing, it is the brdf for the pair of directions at the vertex.
+<pdf> represents the pdf with which the next edge was generated.
+<apdf> represents any additional pdfs computed such as from russian roulette termination.
 Can also be created from an intersection.
 */
 class PathVertex : public Vertex {
 public:
+	Spectrum data;
 	Real pdf, apdf;
 
-	PathVertex(Point pos, Vector3f nor = Vector3f(0., 0., 0.), Object *obj = NULL, Real p = 1., Real ap = 1.) : Vertex(pos, nor, obj), pdf(p), apdf(ap) {}
-	PathVertex(Intersection* inter, Real p = 1., Real ap = 1.) : Vertex(inter->point, inter->normal, inter->object), pdf(p), apdf(ap) {}
+	PathVertex(Point pos, Vector3f nor = Vector3f(0., 0., 0.), Object *obj = NULL, Spectrum d = Spectrum(0., 0., 0.), Real p = 1., Real ap = 1.) : Vertex(pos, nor, obj), data(d), pdf(p), apdf(ap) {}
+	PathVertex(Intersection* inter, Spectrum d = Spectrum(0., 0., 0.), Real p = 1., Real ap = 1.) : Vertex(inter->point, inter->normal, inter->object), data(d), pdf(p), apdf(ap) {}
 
 	inline friend std::ostream& operator<<(std::ostream &os, PathVertex &v){
 		if (v.object)
@@ -27,7 +29,7 @@ public:
 	}
 };
 
-/* Easy abstraction for handling rays in paths */
+/* Abstraction for easier handling of rays in paths */
 struct Edge {
 	PathVertex *begin, *end;
 	Vector3f direction;
@@ -71,10 +73,11 @@ public:
 		return NULL;
 	}
 
-	inline Edge* get_edge_forward() {
+	inline std::unique_ptr<Edge> get_edge_forward() {
 		PathVertex *v1, *v2;
 		if ((v1 = get_vertex_forward()) && (v2 = get_vertex_forward())) {
-			return new Edge(v1, v2);
+			--forwarditerator;
+			return std::make_unique<Edge>(Edge(v1, v2));
 		}
 		return NULL;
 	}
@@ -88,10 +91,11 @@ public:
 		return NULL;
 	}
 
-	inline Edge* get_edge_backward() {
+	inline std::unique_ptr<Edge> get_edge_backward() {
 		PathVertex *v1, *v2;
 		if ((v1 = get_vertex_backward()) && (v2 = get_vertex_backward())) {
-			return new Edge(v1, v2);
+			--backwarditerator;
+			return std::make_unique<Edge>(Edge(v1, v2));
 		}
 		return NULL;
 	}

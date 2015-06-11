@@ -9,6 +9,13 @@ public:
 		generator = new std::mt19937(rd());
 		distribution = new std::uniform_real_distribution<Real>(begin, end);
 	}
+	~Randomizer() {
+		if (generator)
+			delete generator;
+		if (distribution)
+			delete distribution;
+	}
+
 	inline Real generateRandom() {
 		return (*distribution)(*generator);
 	}

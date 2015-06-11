@@ -24,3 +24,8 @@ Quad::Quad(Point a, Point b, Point c, Point d, Material *mat, LightSource *l) {
 	else
 		islight = false;
 }
+
+Quad::~Quad() {
+	delete[] indices;
+	delete[] vertices;
+}

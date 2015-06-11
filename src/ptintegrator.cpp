@@ -15,7 +15,7 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 	Path path = generatePath(ray, scene);
 	path.reset_iterator();
 	//std::cout << "Path = " << path << "\n";
-	Edge *edge1, *edge2;
+	std::unique_ptr<Edge> edge1, edge2;
 
 	if (!(edge1 = path.get_edge_backward())) { // path is only a point
 		return radiance;
@@ -40,8 +40,8 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 		Spectrum s = l->getSample(edge1->begin->position, samplelocation, pdf);
 		direction = samplelocation - edge1->begin->position;
 		if (!scene->intersects(Ray(edge1->begin->position, direction))){ //shadow ray intersection
-			ld += s / (pdf * lpdf);
-			f = edge1->begin->object->getMaterial()->eval(edge1->direction, direction); //check directions
+			ld = s / (pdf * lpdf);
+			f = edge1->begin->object->getMaterial()->eval(Vector3f(-edge1->direction), direction, edge1->begin->normal); //check directions
 			ld *= f;
 		}
 	}
@@ -57,20 +57,21 @@ Spectrum PTIntegrator::getRadiance(Ray *ray, Intersection *isect, Scene *scene, 
 			direction = samplelocation - edge1->begin->position;
 			if (!scene->intersects(Ray(edge2->begin->position, direction))) { //shadow ray intersection
 				ld += s / (pdf * lpdf);
-				f = edge1->end->object->getMaterial()->eval(edge2->direction, direction); //check directions
+				f = edge1->end->object->getMaterial()->eval(Vector3f(-edge2->direction), direction, edge1->end->normal); //check directions
 				ld *= f;
 			}
 		}
 		/* calculate indirect lighting contribution */
 		if (illumination != DIRECT) {
-			f = edge1->end->object->getMaterial()->eval(edge2->direction, edge1->direction); //todo = -ve the directions as we are tracing backward
+			//f = edge1->end->object->getMaterial()->eval(Vector3f(-edge2->direction), Vector3f(-edge1->direction), edge1->end->normal); //todo = -ve the directions as we are tracing backward
+			f = edge1->end->data;
 			radiance = ld + f * radiance * edge2->direction.dot(edge1->end->normal) / (edge1->end->pdf * edge1->end->apdf);
 		}
 		else {
 			radiance = ld;
 		}
 
-		edge1 = edge2;
+		edge1 = std::move(edge2);
 		islight = false;
 	}
 
@@ -121,13 +122,13 @@ Path PTIntegrator::generatePath(Ray* ray, Scene* scene) const {
 			break;
 		}
 
-		/* Importance sampling brdf to get new direction */
+		/* Importance sampling bsdf to get new direction */
 		mat = is.getMaterial(); //get BSDF at intersection location
-		Vector3f wi; // sampled incoming direction
+		Vector3f wi; // - sampled incoming direction
 		Real pdf; // sampled pdf value
 
-		mat->sample(r.direction, wi, is.normal, pdf);
-		path.add_vertex(PathVertex(&is, pdf, apdf));
+		Spectrum f = mat->sample(r.direction, wi, is.normal, pdf);
+		path.add_vertex(PathVertex(&is, f, pdf, apdf));
 
 		/* update new ray in sampled direction */
 		r.direction = wi;

@@ -11,6 +11,7 @@ This implementation assumes a uniform area light.
 class QuadLight : public TriangleMeshLight{
 public:
 	QuadLight(Point a, Point b, Point c, Point d, Spectrum s = Spectrum(1., 1., 1.), Real i = 1.);
+	~QuadLight();
 };
 
 #endif

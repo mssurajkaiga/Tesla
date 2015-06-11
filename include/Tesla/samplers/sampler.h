@@ -6,7 +6,7 @@
 
 class Sampler {
 public:
-	virtual Sample* getSample() const { return NULL; }
+	virtual std::unique_ptr<Sample> getSample() const { return NULL; }
 };
 
 #endif

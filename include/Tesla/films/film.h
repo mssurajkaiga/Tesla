@@ -24,7 +24,14 @@ public:
 	};
 
 	enum mode { EXR , HDR };
-	Film(int x, int y, Filter* f) : x(x), y(y), filter(f) {}
+	Film(int x, int y, Filter* f) : x(x), y(y), filter(f) { data = NULL; }
+	~Film() { 
+		if (data) 
+			delete data; 
+		if (filter)
+			delete filter; 
+	}
+
 	void store(std::vector<Spectrum> d);
 	bool save(std::string filename, mode m);
 };

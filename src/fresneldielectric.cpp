@@ -12,7 +12,7 @@ Spectrum FresnelDielectric::sample(Vector3f &wo, Vector3f &wi, Vector3f &normal,
 	if (!getType().isSpecular())
 		return Spectrum(0., 0., 0.);
 
-	Real cosi = wo.normalized().dot(normal.normalized());
+	Real cosi = -wo.dot(normal);
 	Real sini = sqrtf(std::max(0., 1. - cosi * cosi));
 	Real sint, cost, r;
 
@@ -28,7 +28,7 @@ Spectrum FresnelDielectric::sample(Vector3f &wo, Vector3f &wi, Vector3f &normal,
 	}
 	else {
 		cost = sqrtf(std::max(0., 1. - sint * sint));
-		r = reflectance(fabs(cosi), cost);
+		r = reflectance(cosi, cost);
 	}
 	
 	pdf = 1.;
@@ -50,6 +50,6 @@ Spectrum FresnelDielectric::sample(Vector3f &wo, Vector3f &wi, Vector3f &normal,
 	}
 }
 
-Spectrum FresnelDielectric::eval(Vector3f &wo, Vector3f &wi) const {
+Spectrum FresnelDielectric::eval(Vector3f &wo, Vector3f &wi, Vector3f &normal) const {
 	return Spectrum(0., 0., 0.);
 }

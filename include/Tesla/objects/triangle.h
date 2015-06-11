@@ -13,7 +13,7 @@ protected:
 	int *indices; // array of indices
 
 public:
-	Triangle(TriangleMesh* mesh = NULL, int *i = NULL) : trianglemesh(mesh), indices(i) { setBBox();}
+	Triangle(TriangleMesh* mesh = NULL, int *i = NULL) : Object(""), trianglemesh(mesh), indices(i) { setBBox();}
 	bool intersects(const Ray &ray, Intersection* inter) const;
 	void setBBox();
 	Real getArea() const;

@@ -1,7 +1,15 @@
 #include <Tesla/objects/object.h>
 #include <Tesla/materials/mattematerial.h>
 
-Object::Object(Material *mat, LightSource* l) : material(mat), lightsource(l) { 
+Object::Object(Material *mat, LightSource* l) : material(mat), lightsource(l) {
+	if (lightsource)
+		islight = true;
+	else
+		islight = false;
+	setBBox();
+}
+
+Object::Object(std::string id, Material *mat, LightSource* l) : id(id), material(mat), lightsource(l) {
 	if (lightsource)
 		islight = true;
 	else
@@ -11,6 +19,10 @@ Object::Object(Material *mat, LightSource* l) : material(mat), lightsource(l) {
 
 void Object::setMaterial(Material *mat) {
 	material = mat;
+}
+
+void Object::setId(std::string id) {
+	this->id = id;
 }
 
 /* to do */
@@ -36,7 +48,7 @@ BBox* Object::getBBox() {
 
 std::ostream& operator<<(std::ostream &os, Object &o) {
 	if (o.getMaterial())
-		return os << "Object(" << *(o.material) << ", " << o.bbox << "," << o.islight << ")";
+		return os << "Object(" << o.id << *(o.material) << ", " << o.bbox << "," << o.islight << ")";
 	else 
-		return os << "Object(No Material, " << o.bbox << ")";
+		return os << "Object(" << o.id << ", No Material, " << o.bbox << ")";
 }

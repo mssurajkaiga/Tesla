@@ -5,7 +5,14 @@ TriangleMesh::TriangleMesh(int nv, int nt, int *ind, Vertex *ver, Material *mat,
 	for (int i = 0; i < nv; i++) {
 		vertices[i].object = (TriangleMesh*) this;
 	}
+	cache = NULL;
 	setBBox();
+}
+
+TriangleMesh::~TriangleMesh() {
+	if (cache) {
+		delete[] cache;
+	}
 }
 
 void TriangleMesh::setBBox() {

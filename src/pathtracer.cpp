@@ -3,14 +3,6 @@
 #include <Tesla/integrators/ptintegrator.h>
 #include <iostream>
 
-PathTracer::PathTracer(ImageSampler *sampler, Integrator *i, Film* f) : Renderer(f), imagesampler(sampler), integrator(i) {
-	if (!integrator) {
-		integrator = new PTIntegrator(1, 10, RUSSIAN_ROULETTE, GLOBAL);
-	}
-	if (!sampler) {
-		sampler = new UniformImageSampler;
-	}
-}
 
 void PathTracer::render(Scene *scene, Camera *camera) {
 	/* add preprocess calls like building acceleration structures, setting timer, etc here and then render */
@@ -18,17 +10,26 @@ void PathTracer::render(Scene *scene, Camera *camera) {
 	/* render and store in film */
 	std::vector<Spectrum> values;
 	Spectrum radiance(0., 0., 0.);
-	Intersection i;
+	Intersection it;
 	Ray r;
-	ImageSample* is;
+	std::unique_ptr<ImageSample> is;
+
+	std::cout << "Rendering progress - \n0%";
+	int length = (imagesampler->xmax - imagesampler->xmin) * (imagesampler->ymax - imagesampler->ymin) * imagesampler->spp / 100;
+	int i = 0, percentage = 0;
 	int spp = imagesampler->spp, count = 0;
 	while (is = imagesampler->getSample()) {
-		r = camera->generateRay(imagesampler, is);
-		radiance += integrator->getRadiance(&r, &i, scene, this, is);
+		++i;
+		r = camera->generateRay(imagesampler, is.get());
+		radiance += integrator->getRadiance(&r, &it, scene, this, is.get());
 		if (++count == spp) {
 			count = 0;
 			values.push_back(radiance/spp);
 			radiance = Spectrum(0., 0., 0.);
+		}
+		if (i%length==0){
+			++percentage;
+			std::cout << "\r" << percentage << "% " << std::flush;
 		}
 	}
 

@@ -13,10 +13,8 @@ protected:
 
 public:
 	StratifiedImageSampler(int xmin = 0, int xmax = 800, int ymin = 0, int ymax = 600, int spp = 1, bool j = true);
-	ImageSample* getSample();
+	std::unique_ptr<ImageSample> getSample();
 	inline void setRandomizer(Randomizer* r) { rng = r; }
-	void generateAllSamples();
-	void generateSubSamples(int x, int y);
 };
 
 #endif

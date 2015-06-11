@@ -14,7 +14,10 @@ class Aggregrate
 {
 protected:
 	BBox bbox;
+	bool destroyattached; // if true, then destroy all attached objects and lights when scene is destroyed
+
 public:
+	Aggregrate(bool d = false) : destroyattached(d) {}
 	virtual bool intersects(const Ray &ray, Intersection* inter) = 0;
 	BBox* getBBox() { return &bbox; }
 	virtual void setBBox() = 0;

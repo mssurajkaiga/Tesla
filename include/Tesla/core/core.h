@@ -5,6 +5,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <memory>
 using namespace Eigen;
 
 #define PI 3.14159265359
@@ -14,7 +15,7 @@ using namespace Eigen;
 
 /* change them together */
 #define SHIFT_EPSILON 1e-5; //FLT_MIN is too small
-typedef float Real;
+typedef double Real;
 
 typedef Vector3f Point;
 

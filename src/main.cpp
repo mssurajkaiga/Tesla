@@ -1,5 +1,11 @@
 //disable Qt interface for now
 //#include "app.h"
+
+/* For debugging memory leaks */
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <Tesla/core/core.h>
 #include <Tesla/core/randomizer.h>
 #include <Tesla/integrators/ptintegrator.h>
@@ -29,7 +35,7 @@ int main(int argc, char* argv[])
 	int width = 100, height = 100, spp = 4;
 	bool jitter = false;
 	std::string filename = "output";
-	Scene scene;
+	Scene scene(true);
 	Camera *camera = NULL;
 	int mindepth = 2, maxdepth = 5;
 	TerminationCriterion tc = RUSSIAN_ROULETTE;
@@ -119,8 +125,13 @@ int main(int argc, char* argv[])
 				Quad *quad = new Quad(Vector3f(atof(argv[i]), atof(argv[i + 1]), atof(argv[i + 2])), Vector3f(atof(argv[i + 3]), atof(argv[i + 4]), atof(argv[i + 5])), Vector3f(atof(argv[i + 6]), atof(argv[i + 7]), atof(argv[i + 8])), Vector3f(atof(argv[i + 9]), atof(argv[i + 10]), atof(argv[i + 11])));
 				i += 12;
 				toparse = std::string(argv[i]);
-				if (toparse == "-rgb") {
+				if (toparse == "-rgb" || toparse == "-rgb-matte") {
 					MatteMaterial *mm = new MatteMaterial(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
+					quad->setMaterial(mm);
+					i += 3;
+				}
+				else if (toparse == "-rgb-mirror" ) {
+					MirrorMaterial *mm = new MirrorMaterial(Spectrum(atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3])));
 					quad->setMaterial(mm);
 					i += 3;
 				}
@@ -169,5 +180,6 @@ int main(int argc, char* argv[])
 	PathTracer pt(&sis, &pti, &film);
 	pt.render(&scene, camera);
 	film.save(filename, Film::HDR);
+	_CrtDumpMemoryLeaks();
 	return 0;
 }

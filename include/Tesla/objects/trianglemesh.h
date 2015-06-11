@@ -19,6 +19,7 @@ public:
 	Triangle *cache;
 
 	TriangleMesh(int nv = 0, int nt = 0, int *ind = NULL, Vertex *ver = NULL, Material *mat = NULL, LightSource *l = NULL);
+	~TriangleMesh();
 
 	bool intersects(const Ray &ray, Intersection* inter) const;
 	void setBBox();

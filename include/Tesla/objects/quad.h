@@ -10,6 +10,7 @@ Order of the four vertices specify normal using right hand rule.
 class Quad : public TriangleMesh {
 public:
 	Quad(Point a, Point b, Point c, Point d, Material *mat = NULL, LightSource *l = NULL);
+	~Quad();
 };
 
 #endif

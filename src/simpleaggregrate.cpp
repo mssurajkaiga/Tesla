@@ -1,5 +1,16 @@
 #include <Tesla/objects/simpleaggregrate.h>
 
+SimpleAggregrate::~SimpleAggregrate() {
+	if (destroyattached) {
+		for (auto i = objects.begin(); i != objects.end(); ++i)
+			delete (*i);
+		for (auto i = lights.begin(); i != lights.end(); ++i)
+			delete (*i);
+		for (auto i = lightsources.begin(); i != lightsources.end(); ++i)
+			delete (*i);
+	}
+}
+
 void SimpleAggregrate::add(Object* object) {
 	if (object->isLight())
 		lights.push_back(object);

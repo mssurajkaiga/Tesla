@@ -21,3 +21,8 @@ QuadLight::QuadLight(Point a, Point b, Point c, Point d, Spectrum s, Real i) {
 	material = NULL;
 	lightsource = new PointLightSource(s, i);
 }
+
+QuadLight::~QuadLight() {
+	delete[] indices;
+	delete[] vertices;
+}

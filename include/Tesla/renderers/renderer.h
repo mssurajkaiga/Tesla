@@ -12,7 +12,7 @@ protected:
 	Film *film;
 	
 public:
-	Renderer(Film* film = NULL) : film(film) {}
+	Renderer(Film* film) : film(film) {}
 	virtual void render(Scene *scene, Camera *camera) = 0;
 };
 

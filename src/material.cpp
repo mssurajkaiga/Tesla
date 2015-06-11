@@ -12,10 +12,10 @@ void Material::add(BSDF *b) {
 	}
 }
 
-Spectrum Material::eval(Vector3f &wo, Vector3f &wi) const{
+Spectrum Material::eval(Vector3f &wo, Vector3f &wi, Vector3f &normal) const{
 	Spectrum f(0., 0., 0.);
 	for (int i = 0; i < nbsdfs; ++i) {
-		f += bsdfs[i]->eval(wo, wi);
+		f += bsdfs[i]->eval(wo, wi, normal);
 	}
 	return f;
 }
